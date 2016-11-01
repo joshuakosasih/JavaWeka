@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
+import weka.classifiers.Classifier;
 
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -38,8 +39,9 @@ public class JavaWeka {
         Discretize disc = new Discretize();
         disc.setInputFormat(train);
         Instances filtered = Filter.useFilter(train, disc);
+        filtered.setClassIndex(filtered.numAttributes() - 1);
         
-        //algorithm
+        //algorithm cross validation
         NaiveBayes nbayes = new NaiveBayes();
         nbayes.buildClassifier(filtered);
         Evaluation eval = new Evaluation(filtered);
@@ -47,6 +49,17 @@ public class JavaWeka {
         
         System.out.println(eval.toSummaryString("\nResults\n=====\n", true));
         System.out.println(eval.fMeasure(1)+" "+ eval.precision(1)+" "+ eval.recall(1));
+    
+        //algorithm train set
+        Classifier nb = new NaiveBayes();
+        nb.buildClassifier(filtered);
+        Evaluation eval2 = new Evaluation(filtered);
+        
+        eval2.evaluateModel(nb, filtered);
+        
+        System.out.println(eval2.toSummaryString("\nResults\n=====\n", true));
+        System.out.println(eval2.fMeasure(1)+" "+ eval2.precision(1)+" "+ eval2.recall(1));
+        
     }
     
 }
